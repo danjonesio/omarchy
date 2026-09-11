@@ -15,19 +15,22 @@ fi
 ufw_user_rules=${OMARCHY_UFW_USER_RULES:-/etc/ufw/user.rules}
 ufw_user6_rules=${OMARCHY_UFW_USER6_RULES:-/etc/ufw/user6.rules}
 
-# World-readable UFW user rules: no unsourced 53317 ACCEPT, and the RFC1918
-# sources are present. A second user on an already-repaired machine no-ops
-# without asking for a password.
+# Arch ships the UFW user rules world-readable (0644) and ufw keeps that mode
+# when it rewrites them, so a second user on an already-repaired machine no-ops
+# without asking for a password: no unsourced 53317 ACCEPT, and every private
+# source is present. Rules that cannot be read fall through to the privileged
+# rewrite, which is idempotent.
 already_limited() {
   local rules=$1 v6=$2
-  [[ -f $rules ]] || return 1
+  [[ -r $rules ]] || return 1
   if grep -- '-A ufw-user-input' "$rules" | grep 53317 | grep -v -- '-s ' | grep -q ACCEPT; then
     return 1
   fi
   grep 53317 "$rules" | grep -q '10.0.0.0/8' || return 1
   grep 53317 "$rules" | grep -q '172.16.0.0/12' || return 1
   grep 53317 "$rules" | grep -q '192.168.0.0/16' || return 1
-  [[ -f $v6 ]] || return 0
+  [[ -e $v6 ]] || return 0
+  [[ -r $v6 ]] || return 1
   if grep -- '-A ufw6-user-input' "$v6" | grep 53317 | grep -v -- '-s ' | grep -q ACCEPT; then
     return 1
   fi
