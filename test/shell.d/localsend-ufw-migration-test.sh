@@ -167,16 +167,15 @@ pass "already-limited LocalSend UFW rules are a no-op"
 
 if (( EUID == 0 )); then
   pass "running as root; skipping the missing-privileges check, which needs sudo to be consulted"
-  exit 0
+else
+  write_open_rules
+  if PATH="$test_dir/failing-bin:$ROOT/bin:$PATH" \
+    OMARCHY_UFW_USER_RULES="$user_rules" \
+    OMARCHY_UFW_USER6_RULES="$user6_rules" \
+    bash -euo pipefail "$migration" >/dev/null 2>"$test_dir/err"; then
+    fail "missing privileges leave the migration pending"
+  fi
+  grep -q 'Administrator privileges are required' "$test_dir/err" ||
+    fail "missing privileges explain how to retry" "$(cat "$test_dir/err")"
+  pass "missing privileges leave the LocalSend UFW migration pending"
 fi
-
-write_open_rules
-if PATH="$test_dir/failing-bin:$ROOT/bin:$PATH" \
-  OMARCHY_UFW_USER_RULES="$user_rules" \
-  OMARCHY_UFW_USER6_RULES="$user6_rules" \
-  bash -euo pipefail "$migration" >/dev/null 2>"$test_dir/err"; then
-  fail "missing privileges leave the migration pending"
-fi
-grep -q 'Administrator privileges are required' "$test_dir/err" ||
-  fail "missing privileges explain how to retry" "$(cat "$test_dir/err")"
-pass "missing privileges leave the LocalSend UFW migration pending"
