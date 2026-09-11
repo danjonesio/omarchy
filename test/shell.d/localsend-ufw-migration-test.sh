@@ -95,6 +95,12 @@ write_limited_rules() {
 ### tuple ### allow tcp 53317 0.0.0.0/0 any 192.168.0.0/16 in comment=6f6d61726368792d6c6f63616c73656e64
 -A ufw-user-input -p tcp --dport 53317 -s 192.168.0.0/16 -j ACCEPT
 
+### tuple ### allow udp 53317 0.0.0.0/0 any 169.254.0.0/16 in comment=6f6d61726368792d6c6f63616c73656e64
+-A ufw-user-input -p udp --dport 53317 -s 169.254.0.0/16 -j ACCEPT
+
+### tuple ### allow tcp 53317 0.0.0.0/0 any 169.254.0.0/16 in comment=6f6d61726368792d6c6f63616c73656e64
+-A ufw-user-input -p tcp --dport 53317 -s 169.254.0.0/16 -j ACCEPT
+
 ### END RULES ###
 COMMIT
 EOF
@@ -140,7 +146,7 @@ else
 fi
 grep -q '^ufw --force delete allow 53317/tcp$' "$CALLS" || fail "open rules delete unrestricted TCP"
 grep -q '^ufw --force delete allow 53317/udp$' "$CALLS" || fail "open rules delete unrestricted UDP"
-for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 fe80::/10 fc00::/7; do
+for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 169.254.0.0/16 fe80::/10 fc00::/7; do
   grep -q "^ufw allow in proto udp from $cidr to any port 53317 " "$CALLS" ||
     fail "open rules add UDP from $cidr"
   grep -q "^ufw allow in proto tcp from $cidr to any port 53317 " "$CALLS" ||

@@ -29,6 +29,7 @@ already_limited() {
   grep 53317 "$rules" | grep -q '10.0.0.0/8' || return 1
   grep 53317 "$rules" | grep -q '172.16.0.0/12' || return 1
   grep 53317 "$rules" | grep -q '192.168.0.0/16' || return 1
+  grep 53317 "$rules" | grep -q '169.254.0.0/16' || return 1
   [[ -e $v6 ]] || return 0
   [[ -r $v6 ]] || return 1
   if grep -- '-A ufw6-user-input' "$v6" | grep 53317 | grep -v -- '-s ' | grep -q ACCEPT; then
@@ -55,7 +56,7 @@ set -euo pipefail
 ufw --force delete allow 53317/tcp >/dev/null 2>&1 || true
 ufw --force delete allow 53317/udp >/dev/null 2>&1 || true
 
-for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
+for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 169.254.0.0/16; do
   ufw allow in proto udp from "$cidr" to any port 53317 comment 'omarchy-localsend' >/dev/null
   ufw allow in proto tcp from "$cidr" to any port 53317 comment 'omarchy-localsend' >/dev/null
 done

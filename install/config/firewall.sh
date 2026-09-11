@@ -3,9 +3,10 @@ ufw default deny incoming
 ufw default allow outgoing
 
 # Allow LocalSend on private networks only. Do not snapshot the current LAN
-# prefix: that breaks at the next wifi. RFC1918 matches Sunshine; IPv6 is ULA
-# and link-local so a global address is not reachable from the internet.
-for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16; do
+# prefix: that breaks at the next wifi. RFC1918 matches Sunshine, plus
+# link-local for a cable with no DHCP; IPv6 is ULA and link-local so a global
+# address is not reachable from the internet.
+for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 169.254.0.0/16; do
   ufw allow in proto udp from "$cidr" to any port 53317 comment 'omarchy-localsend'
   ufw allow in proto tcp from "$cidr" to any port 53317 comment 'omarchy-localsend'
 done
