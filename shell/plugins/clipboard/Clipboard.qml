@@ -74,10 +74,6 @@ Item {
 
   function saveHistory() {
     historyFile.setText(JSON.stringify(root.history.slice(0, root.historyLimit), null, 2) + "\n")
-    // FileView creates the JSON at umask 022 (0644). Image blobs from
-    // capture.sh are already 0600; the text dump of the same clipboard
-    // should not be world-readable.
-    Quickshell.execDetached(["chmod", "600", root.historyPath])
   }
 
   function addClipboardEntry(entry) {
@@ -259,6 +255,9 @@ Item {
     printErrors: false
     onLoaded: root.loadHistory(text())
     onLoadFailed: root.loadHistory("[]")
+    // The atomic write lands a new file at umask 022 (0644) and keeps the old mode on later saves,
+    // so chmod once it is in place: the clipboard can hold passwords, and its images are 0600.
+    onSaved: Quickshell.execDetached(["chmod", "600", root.historyPath])
     onFileChanged: reload()
   }
 

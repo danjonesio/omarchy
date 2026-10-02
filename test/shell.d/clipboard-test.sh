@@ -163,8 +163,8 @@ assert(
   'clipboard does not select rows from containsMouse'
 )
 assert(
-  /function saveHistory\(\)[\s\S]*Quickshell\.execDetached\(\["chmod", "600", root\.historyPath\]\)/.test(clipboardQml),
-  'clipboard saveHistory chmods the history file 0600'
+  clipboardQml.includes('onSaved: Quickshell.execDetached(["chmod", "600", root.historyPath])'),
+  'clipboard chmods the history file 0600 once each save has landed'
 )
 assert(
   clipboardQml.includes('command: ["setpriv", "--pdeathsig", "TERM", "wl-paste", "--type", "text", "--watch", root.captureScript, "text"]'),
