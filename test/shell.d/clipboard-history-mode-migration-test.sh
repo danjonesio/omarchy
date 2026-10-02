@@ -17,13 +17,13 @@ run_migration() {
 run_migration
 pass "clipboard mode migration no-ops when history is absent"
 
-mkdir -p "$test_dir/state/omarchy/clipboard-images"
-printf '[]\n' >"$test_dir/state/omarchy/clipboard-history.json"
-chmod 644 "$test_dir/state/omarchy/clipboard-history.json"
+mkdir -p "$test_dir/state/omarchy/clipboard-images" "$test_dir/home/.local/state/omarchy"
+printf '[]\n' >"$test_dir/home/.local/state/omarchy/clipboard-history.json"
+chmod 644 "$test_dir/home/.local/state/omarchy/clipboard-history.json"
 chmod 755 "$test_dir/state/omarchy/clipboard-images"
 
 run_migration
-[[ $(stat -c '%a' "$test_dir/state/omarchy/clipboard-history.json") == 600 ]] ||
+[[ $(stat -c '%a' "$test_dir/home/.local/state/omarchy/clipboard-history.json") == 600 ]] ||
   fail "clipboard mode migration sets history JSON 0600"
 pass "clipboard mode migration sets history JSON 0600"
 [[ $(stat -c '%a' "$test_dir/state/omarchy/clipboard-images") == 700 ]] ||
@@ -31,6 +31,6 @@ pass "clipboard mode migration sets history JSON 0600"
 pass "clipboard mode migration sets images directory 0700"
 
 run_migration
-[[ $(stat -c '%a' "$test_dir/state/omarchy/clipboard-history.json") == 600 ]] ||
+[[ $(stat -c '%a' "$test_dir/home/.local/state/omarchy/clipboard-history.json") == 600 ]] ||
   fail "clipboard mode migration is idempotent"
 pass "clipboard mode migration is idempotent"

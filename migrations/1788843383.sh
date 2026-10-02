@@ -1,8 +1,8 @@
 echo "Restrict clipboard history file modes"
 
-state="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy"
-json="$state/clipboard-history.json"
-images="$state/clipboard-images"
+# Clipboard.qml writes the history under HOME whatever XDG_STATE_HOME says; capture.sh honours it for images.
+json="$HOME/.local/state/omarchy/clipboard-history.json"
+images="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/clipboard-images"
 
 if [[ -f $json ]]; then
   chmod 600 "$json"
